@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esercizi Express.js</title>
+    <link href="/style.css" rel="stylesheet">
+  </head>
+  <body class="bg-gradient-to-r from-blue-100 to-purple-100 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-4xl font-bold mb-10 text-center text-gray-800 border-b-2 pb-4">
+        📱 Esercizi Express.js
+      </h1>
+
+      <div class="grid gap-6 md:grid-cols-2">
+        <!-- Esercizio 1: Frasi Random -->
+        <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all hover:scale-105">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">
+            1. Frasi Random 🎲
+          </h2>
+          <button onclick="generaFrase()" 
+                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-3 rounded-lg transition-colors">
+            Genera Frase
+          </button>
+          <div id="risultatoFrase" class="mt-4 p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[60px]"></div>
+        </div>
+
+        <!-- Esercizio 2: Convertitore -->
+        <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all hover:scale-105">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">
+            2. Convertitore KM/Miglia 🔄
+          </h2>
+          <div class="flex gap-2">
+            <input type="number" id="km" placeholder="Inserisci i km" 
+                   class="flex-1 border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+            <button onclick="converti()" 
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg transition-colors">
+              Converti
+            </button>
+          </div>
+          <div id="risultatoConversione" class="mt-4 p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[60px]"></div>
+        </div>
+
+        <!-- Esercizio 3: Calcolatore -->
+        <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all hover:scale-105">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">
+            3. Calcolatore Somma ➕
+          </h2>
+          <div class="flex gap-2 mb-3">
+            <input type="number" id="num1" placeholder="Primo numero" 
+                   class="flex-1 border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+            <input type="number" id="num2" placeholder="Secondo numero" 
+                   class="flex-1 border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+          </div>
+          <button onclick="somma()" 
+                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+            Calcola
+          </button>
+          <div id="risultatoSomma" class="mt-4 p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[60px]"></div>
+        </div>
+
+        <!-- Esercizio 4: Gestione File -->
+        <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all hover:scale-105">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">
+            4. Gestione File di Testo 📋
+          </h2>
+          <textarea id="testo" rows="4" placeholder="Inserisci il testo"
+                    class="w-full border-2 border-gray-200 rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-blue-500"></textarea>
+          <div class="flex gap-2">
+            <button onclick="salvaTesto()" 
+                    class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+              Salva
+            </button>
+            <button onclick="cancellaTesto()" 
+                    class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+              Cancella
+            </button>
+          </div>
+          <div id="risultatoTesto" class="mt-4 p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[60px]"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function converti() {
+        const km = document.getElementById("km").value;
+        const response = await fetch(`/esercizio2/converti?k=${km}`);
+        const data = await response.json();
+        document.getElementById(
+          "risultatoConversione"
+        ).innerText = `${data.chilometri} km = ${data.miglia} miglia`;
+      }
+
+      async function somma() {
+        const a = document.getElementById("num1").value;
+        const b = document.getElementById("num2").value;
+        const response = await fetch(`/esercizio3/somma?a=${a}&b=${b}`);
+        const data = await response.json();
+        document.getElementById("risultatoSomma").innerText = data.messaggio;
+      }
+
+      async function salvaTesto() {
+        try {
+          const testo = document.getElementById("testo").value;
+          const response = await fetch("/esercizio4/testo", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ testo }),
+          });
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.errore || 'Errore durante il salvataggio');
+          }
+          
+          document.getElementById("risultatoTesto").innerText = data.messaggio;
+        } catch (error) {
+          document.getElementById("risultatoTesto").innerText = `Errore: ${error.message}`;
+        }
+      }
+
+      async function leggiTesto() {
+        try {
+          const response = await fetch("/esercizio4/testo", {
+            method: "GET",
+            headers: {
+              "Accept": "application/json"
+            }
+          });
+          
+          // Prima controlliamo se la risposta è ok
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.errore || 'Errore durante la lettura');
+          }
+      
+          const data = await response.json();
+          
+          // Aggiorniamo sia il textarea che il messaggio di stato
+          document.getElementById("testo").value = data.testo;
+          document.getElementById("risultatoTesto").innerText = "Testo caricato con successo";
+        } catch (error) {
+          console.error('Errore:', error);
+          document.getElementById("risultatoTesto").innerText = `Errore: ${error.message}`;
+        }
+      }
+
+      async function cancellaTesto() {
+        try {
+          const response = await fetch("/esercizio4/testo", {
+            method: "DELETE"
+          });
+          const data = await response.json();
+          document.getElementById("testo").value = "";
+          document.getElementById("risultatoTesto").innerText = data.messaggio;
+        } catch (error) {
+          document.getElementById("risultatoTesto").innerText = `Errore: ${error.message}`;
+        }
+      }
+
+      async function generaFrase() {
+        const response = await fetch('/esercizio1/frase');
+        const data = await response.json();
+        document.getElementById('risultatoFrase').innerText = data.frase;
+      }
+    </script>
+  </body>
+</html>

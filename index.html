@@ -78,6 +78,35 @@
           </div>
           <div id="risultatoTesto" class="mt-4 p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[60px]"></div>
         </div>
+
+        <!-- Esercizio 4.1: Analisi Testo -->
+        <div class="bg-white rounded-xl shadow-lg p-6 transform transition-all hover:scale-105">
+          <h2 class="text-xl font-bold mb-4 text-blue-600">
+            4.1 Analisi e Modifica Testo 📊
+          </h2>
+          <div class="space-y-4">
+            <button onclick="analizzaTesto()" 
+                    class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+              Analizza Testo
+            </button>
+            
+            <div class="border-t pt-4">
+              <h3 class="font-semibold mb-2">Sostituisci Parola</h3>
+              <div class="flex gap-2">
+                <input type="text" id="parolaVecchia" placeholder="Parola da sostituire" 
+                       class="flex-1 border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+                <input type="text" id="parolaNuova" placeholder="Nuova parola" 
+                       class="flex-1 border-2 border-gray-200 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500" />
+              </div>
+              <button onclick="sostituisciParola()" 
+                      class="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                Sostituisci
+              </button>
+            </div>
+            
+            <div id="risultatoAnalisi" class="mt-4 p-3 bg-gray-50 rounded-lg text-gray-700 min-h-[60px] whitespace-pre-line"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -164,6 +193,60 @@
         const response = await fetch('/esercizio1/frase');
         const data = await response.json();
         document.getElementById('risultatoFrase').innerText = data.frase;
+      }
+
+      async function analizzaTesto() {
+        try {
+          const response = await fetch("/esercizio4/testo");
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.errore || 'Errore durante l\'analisi');
+          }
+          
+          const risultato = 
+            `📝 Parole: ${data.num_parole}\n` +
+            `📏 Caratteri: ${data.num_caratteri}\n` +
+            `🔤 Vocali: ${data.num_vocali}\n` +
+            `🔠 Consonanti: ${data.num_consonanti}\n` +
+            `📈 Parola più lunga: "${data.parola_piu_lunga}"\n` +
+            `📉 Parola più corta: "${data.parola_piu_corta}"\n` +
+            `🔄 Parola più ripetuta: "${data.parola_piu_ripetuta}" (${data.parola_piu_ripetuta_volte} volte)`;
+          
+          document.getElementById("risultatoAnalisi").innerText = risultato;
+        } catch (error) {
+          document.getElementById("risultatoAnalisi").innerText = `Errore: ${error.message}`;
+        }
+      }
+
+      async function sostituisciParola() {
+        try {
+          const parola_vecchia = document.getElementById("parolaVecchia").value;
+          const parola_nuova = document.getElementById("parolaNuova").value;
+          
+          const response = await fetch("/esercizio4/testo/cambia-parola", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ parola_vecchia, parola_nuova }),
+          });
+          
+          const data = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(data.errore);
+          }
+          
+          document.getElementById("risultatoAnalisi").innerText = 
+            `✅ ${data.messaggio}\n🔄 Sostituzioni effettuate: ${data.sostituzioni}`;
+          
+          // Pulisci i campi input
+          document.getElementById("parolaVecchia").value = "";
+          document.getElementById("parolaNuova").value = "";
+        } catch (error) {
+          document.getElementById("risultatoAnalisi").innerText = `Errore: ${error.message}`;
+        }
       }
     </script>
   </body>

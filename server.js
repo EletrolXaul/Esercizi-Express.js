@@ -73,6 +73,7 @@ sommaRouter.get("/", (req, res) => {
   });
 });
 
+// ---------- ESERCIZIO 4: Gestione File di Testo Base ----------
 // Percorso del file di testo
 const FILE_PATH = path.join(__dirname, "testo.txt");
 
@@ -114,7 +115,51 @@ testoRouter.delete("/", (req, res) => {
   });
 });
 
-// GET per leggere il contenuto del file
+// ---------- ESERCIZIO 4.1: Analisi e Modifica Testo ----------
+// Funzioni di utilità per l'analisi del testo
+function analizzaTesto(testo) {
+  if (!testo) return null;
+  
+  const parole = testo.toLowerCase().split(/\s+/).filter(p => p.length > 0);
+  const caratteri = testo.length;
+  const vocali = (testo.match(/[aeiouàèéìòù]/gi) || []).length;
+  const consonanti = (testo.match(/[bcdfghjklmnpqrstvwxyz]/gi) || []).length;
+  
+  // Trova la parola più lunga e più corta
+  const parolaLunga = parole.reduce((a, b) => a.length >= b.length ? a : b, "");
+  const parolaCorta = parole.reduce((a, b) => a.length <= b.length ? a : b, parole[0] || "");
+  
+  // Conta occorrenze delle parole
+  const frequenza = {};
+  parole.forEach(parola => {
+    frequenza[parola] = (frequenza[parola] || 0) + 1;
+  });
+  
+  // Trova la parola più ripetuta
+  let parolaRipetuta = "";
+  let maxRipetizioni = 0;
+  
+  Object.entries(frequenza).forEach(([parola, count]) => {
+    if (count > maxRipetizioni) {
+      parolaRipetuta = parola;
+      maxRipetizioni = count;
+    }
+  });
+
+  return {
+    testo,
+    num_parole: parole.length,
+    num_caratteri: caratteri,
+    num_vocali: vocali,
+    num_consonanti: consonanti,
+    parola_piu_lunga: parolaLunga,
+    parola_piu_corta: parolaCorta,
+    parola_piu_ripetuta: parolaRipetuta,
+    parola_piu_ripetuta_volte: maxRipetizioni
+  };
+}
+
+// Modifica il GET esistente per includere l'analisi
 testoRouter.get("/", (req, res) => {
   try {
     if (!fs.existsSync(FILE_PATH)) {
@@ -128,12 +173,64 @@ testoRouter.get("/", (req, res) => {
           errore: "Errore durante la lettura del file"
         });
       }
-      res.json({ testo: data });
+      
+      const analisi = analizzaTesto(data);
+      res.json(analisi);
     });
   } catch (error) {
     console.error('Errore:', error);
     res.status(500).json({
       errore: "Errore durante l'accesso al file"
+    });
+  }
+});
+
+// Nuova route per cambiare parola
+testoRouter.post("/cambia-parola", express.json(), (req, res) => {
+  try {
+    const { parola_vecchia, parola_nuova } = req.body;
+    
+    if (!parola_vecchia || !parola_nuova) {
+      return res.status(400).json({
+        errore: "Specificare sia parola_vecchia che parola_nuova"
+      });
+    }
+
+    fs.readFile(FILE_PATH, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Errore durante la lettura:', err);
+        return res.status(500).json({
+          errore: "Errore durante la lettura del file"
+        });
+      }
+
+      // Verifica se la parola vecchia esiste nel testo
+      if (!data.includes(parola_vecchia)) {
+        return res.status(404).json({
+          errore: "La parola specificata non è presente nel testo"
+        });
+      }
+
+      // Sostituisce tutte le occorrenze della parola
+      const nuovoTesto = data.replace(new RegExp(parola_vecchia, 'g'), parola_nuova);
+
+      fs.writeFile(FILE_PATH, nuovoTesto, 'utf8', (err) => {
+        if (err) {
+          console.error('Errore durante il salvataggio:', err);
+          return res.status(500).json({
+            errore: "Errore durante il salvataggio delle modifiche"
+          });
+        }
+        res.json({ 
+          messaggio: "Parola sostituita con successo",
+          sostituzioni: (data.match(new RegExp(parola_vecchia, 'g')) || []).length
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Errore:', error);
+    res.status(500).json({
+      errore: "Errore durante l'elaborazione della richiesta"
     });
   }
 });

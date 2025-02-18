@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Express.js - Esercizi</title>
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen p-6 font-['Inter']">
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-5xl font-bold mb-4 text-gray-800">
+                Express.js
+                <span class="text-blue-600">Esercizi</span>
+            </h1>
+            <p class="text-gray-600 text-lg">Una raccolta di esercizi pratici con Express.js</p>
+        </header>
+
+        <div id="exercises-container" class="grid gap-8 md:grid-cols-2 lg:grid-cols-2">
+            <!-- Gli esercizi verranno inseriti qui dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Toast di notifica -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg transform translate-y-full opacity-0 transition-all duration-300">
+        Operazione completata con successo
+    </div>
+
+    <script type="module" src="/js/main.js"></script>
+</body>
+</html>

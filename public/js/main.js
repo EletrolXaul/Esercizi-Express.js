@@ -103,13 +103,125 @@ window.sostituisciParola = async () => {
       body: JSON.stringify({ parola_vecchia, parola_nuova })
     });
     const data = await response.json();
+    
+    // Aggiorna entrambi i risultati
     document.getElementById("risultatoAnalisi").innerText = 
       `✅ ${data.messaggio}\n🔄 Sostituzioni effettuate: ${data.sostituzioni}`;
+    
+    // Aggiorna anche il testo nell'esercizio 4
+    const testoResponse = await fetch("/esercizio4/testo");
+    const testoData = await testoResponse.json();
+    document.getElementById("testo").value = testoData.testo;
+    
     showToast('Parola sostituita con successo', 'success');
   } catch (error) {
     showToast('Errore durante la sostituzione', 'error');
   }
 };
+
+window.calcola = async () => {
+  try {
+    const num1 = parseFloat(document.getElementById("num1").value);
+    const num2 = parseFloat(document.getElementById("num2").value);
+    const op = document.getElementById("operazione").value;
+    
+    if (isNaN(num1) || isNaN(num2)) {
+      throw new Error("Inserisci numeri validi");
+    }
+    
+    let risultato;
+    let simbolo = op;
+    
+    switch(op) {
+      case "+":
+        risultato = num1 + num2;
+        break;
+      case "-":
+        risultato = num1 - num2;
+        break;
+      case "*":
+        risultato = num1 * num2;
+        simbolo = "×";
+        break;
+      case "/":
+        if (num2 === 0) throw new Error("Non puoi dividere per zero");
+        risultato = num1 / num2;
+        simbolo = "÷";
+        break;
+    }
+    
+    document.getElementById("risultatoCalcolo").innerText = 
+      `${num1} ${simbolo} ${num2} = ${risultato.toFixed(2)}`;
+    showToast('Calcolo completato', 'success');
+  } catch (error) {
+    document.getElementById("risultatoCalcolo").innerText = `Errore: ${error.message}`;
+    showToast(error.message, 'error');
+  }
+};
+
+// Stato della calcolatrice
+let displayValue = '';
+let currentOperation = '';
+let firstNumber = null;
+
+window.gestisciInput = (valore) => {
+  if (valore === '.' && displayValue.includes('.')) return;
+  displayValue += valore;
+  aggiornaDisplay();
+};
+
+window.calcolaRisultato = () => {
+  try {
+    const risultato = eval(displayValue);
+    displayValue = risultato.toString();
+    aggiornaDisplay();
+    showToast('Calcolo completato', 'success');
+  } catch (error) {
+    displayValue = '';
+    document.getElementById('preview').innerText = 'Errore';
+    showToast('Errore nel calcolo', 'error');
+  }
+};
+
+window.pulisciDisplay = () => {
+  displayValue = '';
+  aggiornaDisplay();
+};
+
+window.cancellaUltimo = () => {
+  displayValue = displayValue.slice(0, -1);
+  aggiornaDisplay();
+};
+
+function aggiornaDisplay() {
+  const display = document.getElementById('display');
+  const preview = document.getElementById('preview');
+  display.innerText = displayValue || '0';
+  
+  try {
+    if (displayValue) {
+      const risultato = eval(displayValue);
+      preview.innerText = risultato.toString();
+    } else {
+      preview.innerText = '';
+    }
+  } catch {
+    preview.innerText = 'In attesa...';
+  }
+}
+
+// Gestione input da tastiera
+document.addEventListener('keydown', (e) => {
+  if (e.key.match(/[0-9\.\+\-\*\/]/)) {
+    gestisciInput(e.key);
+  } else if (e.key === 'Enter') {
+    calcolaRisultato();
+  } else if (e.key === 'Backspace') {
+    cancellaUltimo();
+  } else if (e.key === 'Escape') {
+    pulisciDisplay();
+  }
+});
 
 const exercises = [
   setupFraseRandom(),

@@ -14,8 +14,12 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Route principale
-app.get('/', (req, res) => {
+app.get('/', (_, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/calculator.html', (_, res) => {
+  res.sendFile(path.join(__dirname, 'public/calculator.html'));
 });
 
 // Registra i router

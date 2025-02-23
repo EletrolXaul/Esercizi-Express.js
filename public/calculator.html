@@ -1,0 +1,49 @@
+<!-- public/calculator.html -->
+<div class="calculator-wrapper max-w-[320px] mx-auto bg-gradient-to-b from-gray-800 to-gray-900 p-5 rounded-3xl shadow-2xl">
+  <!-- Display -->
+  <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 mb-4">
+    <div id="preview" class="text-right text-gray-400 text-sm h-5 mb-1"></div>
+    <div id="display" class="text-right text-white text-4xl font-bold h-12 overflow-hidden">0</div>
+  </div>
+
+  <!-- Layout calcolatrice -->
+  <div class="calculator-grid">
+    <div class="grid grid-cols-4 gap-2">
+      <!-- Riga 1 -->
+      <button onclick="pulisciDisplay()" class="calc-btn col-span-2 bg-gradient-to-r from-red-500 to-red-600">AC</button>
+      <button onclick="cancellaUltimo()" class="calc-btn bg-gradient-to-r from-orange-500 to-orange-600">⌫</button>
+      <button onclick="gestisciInput('/')" class="calc-btn operator bg-gradient-to-r from-blue-500 to-blue-600">÷</button>
+    </div>
+
+    <div class="grid grid-cols-4 gap-2">
+      <!-- Riga 2 -->
+      <button onclick="gestisciInput('7')" class="calc-btn number">7</button>
+      <button onclick="gestisciInput('8')" class="calc-btn number">8</button>
+      <button onclick="gestisciInput('9')" class="calc-btn number">9</button>
+      <button onclick="gestisciInput('*')" class="calc-btn operator bg-gradient-to-r from-blue-500 to-blue-600">×</button>
+    </div>
+
+    <div class="grid grid-cols-4 gap-2">
+      <!-- Riga 3 -->
+      <button onclick="gestisciInput('4')" class="calc-btn number">4</button>
+      <button onclick="gestisciInput('5')" class="calc-btn number">5</button>
+      <button onclick="gestisciInput('6')" class="calc-btn number">6</button>
+      <button onclick="gestisciInput('-')" class="calc-btn operator bg-gradient-to-r from-blue-500 to-blue-600">−</button>
+    </div>
+
+    <div class="grid grid-cols-4 gap-2">
+      <!-- Riga 4 -->
+      <button onclick="gestisciInput('1')" class="calc-btn number">1</button>
+      <button onclick="gestisciInput('2')" class="calc-btn number">2</button>
+      <button onclick="gestisciInput('3')" class="calc-btn number">3</button>
+      <button onclick="gestisciInput('+')" class="calc-btn operator bg-gradient-to-r from-blue-500 to-blue-600">+</button>
+    </div>
+
+    <div class="grid grid-cols-4 gap-2">
+      <!-- Riga 5 -->
+      <button onclick="gestisciInput('0')" class="calc-btn number col-span-2">0</button>
+      <button onclick="gestisciInput('.')" class="calc-btn number">.</button>
+      <button onclick="calcolaRisultato()" class="calc-btn bg-gradient-to-r from-green-500 to-green-600">=</button>
+    </div>
+  </div>
+</div>
